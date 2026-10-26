@@ -1,0 +1,122 @@
+{
+  "apiVersion": "v1",
+  "kind": "List",
+  "items": [
+    {
+      "apiVersion": "argoproj.io/v1alpha1",
+      "kind": "Application",
+      "metadata": {
+        "name": "demo",
+        "namespace": "default",
+        "uid": "demo-uid"
+      },
+      "spec": {
+        "destination": {
+          "namespace": "default"
+        }
+      },
+      "status": {
+        "sync": {
+          "status": "Synced",
+          "revision": "abc123"
+        },
+        "health": {
+          "status": "Degraded"
+        },
+        "resources": [
+          {
+            "kind": "Deployment",
+            "namespace": "default",
+            "name": "demo"
+          }
+        ],
+        "operationState": {
+          "phase": "Succeeded",
+          "startedAt": "2026-10-26T00:00:00Z",
+          "finishedAt": "2026-10-26T00:00:05Z"
+        }
+      }
+    },
+    {
+      "apiVersion": "apps/v1",
+      "kind": "Deployment",
+      "metadata": {
+        "name": "demo",
+        "namespace": "default",
+        "uid": "demo-uid",
+        "generation": 1
+      },
+      "spec": {
+        "replicas": 1
+      },
+      "status": {
+        "observedGeneration": 1,
+        "conditions": [
+          {
+            "type": "Progressing",
+            "status": "False",
+            "reason": "ProgressDeadlineExceeded"
+          }
+        ],
+        "replicas": 1
+      }
+    },
+    {
+      "apiVersion": "apps/v1",
+      "kind": "ReplicaSet",
+      "metadata": {
+        "name": "demo-rs",
+        "namespace": "default",
+        "uid": "demo-rs-uid",
+        "ownerReferences": [
+          {
+            "kind": "Deployment",
+            "uid": "demo-uid"
+          }
+        ]
+      }
+    },
+    {
+      "apiVersion": "v1",
+      "kind": "Pod",
+      "metadata": {
+        "name": "demo-pod",
+        "namespace": "default",
+        "uid": "demo-pod-uid",
+        "ownerReferences": [
+          {
+            "kind": "ReplicaSet",
+            "uid": "demo-rs-uid"
+          }
+        ]
+      },
+      "status": {
+        "phase": "Pending",
+        "containerStatuses": [
+          {
+            "name": "app",
+            "state": {
+              "waiting": {
+                "reason": "ImagePullBackOff"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "apiVersion": "v1",
+      "kind": "Event",
+      "metadata": {
+        "name": "demo-event",
+        "namespace": "default",
+        "uid": "demo-event-uid"
+      },
+      "involvedObject": {
+        "uid": "demo-pod-uid"
+      },
+      "reason": "Failed",
+      "lastTimestamp": "2026-10-26T00:00:00Z"
+    }
+  ]
+}
